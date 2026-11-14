@@ -3,10 +3,6 @@ import os
 import sys
 
 def muat_basis_pengetahuan(nama_file="kb_wifi.json"):
-    """
-    Membaca file basis pengetahuan JSON.
-    Mendukung pencarian di direktori kerja saat ini maupun di direktori file skrip.
-    """
     direktori_skrip = os.path.dirname(os.path.abspath(__file__))
     path_file = os.path.join(direktori_skrip, nama_file)
 
@@ -21,11 +17,6 @@ def muat_basis_pengetahuan(nama_file="kb_wifi.json"):
         return json.load(f)
 
 def cari_fakta_dasar(aturan):
-    """
-    Fakta dasar adalah fakta yang ada di syarat 'jika',
-    tetapi tidak pernah dihasilkan oleh 'maka' dari aturan mana pun.
-    Fakta inilah yang perlu ditanyakan ke pengguna.
-    """
     semua_hasil = {r["maka"] for r in aturan}
     fakta_dasar = []
     fakta_tercatat = set()
@@ -38,7 +29,6 @@ def cari_fakta_dasar(aturan):
     return fakta_dasar
 
 def tanyakan_user(fakta_dasar):
-    """Mengumpulkan jawaban user (y/t)."""
     memori = set()
     print("Jawab pertanyaan berikut dengan 'y' (ya) atau 't' (tidak):\n")
     for i, fakta in enumerate(fakta_dasar, 1):
@@ -54,24 +44,17 @@ def tanyakan_user(fakta_dasar):
     return memori
 
 def forward_chaining(aturan, memori_awal):
-    """
-    Mesin inferensi Forward Chaining:
-    Mencari aturan yang syaratnya terpenuhi dan hasilnya belum ada di memori.
-    Ulangi siklus hingga tidak ada aturan baru yang terpicu.
-    """
     memori = set(memori_awal)
-    riwayat_alasan = {}  # Format: hasil -> (aturan_id, premis_pendukung, sumber)
+    riwayat_alasan = {}
     siklus = 1
     log_siklus = []
 
     while True:
         aturan_cocok = []
         for r in aturan:
-            # Lewati jika kesimpulan sudah ada di memori
             if r["maka"] in memori:
                 continue
 
-            # Evaluasi syarat berdasarkan mode 'dan' / 'atau'
             if r["mode"] == "dan":
                 terpenuhi = all(syarat in memori for syarat in r["jika"])
                 premis_aktif = r["jika"] if terpenuhi else []
@@ -85,12 +68,10 @@ def forward_chaining(aturan, memori_awal):
             if terpenuhi:
                 aturan_cocok.append((r, premis_aktif))
 
-        # Jika tidak ada aturan yang cocok, hentikan inferensi
         if not aturan_cocok:
             log_siklus.append(f"Siklus {siklus}: tidak ada aturan baru, inferensi selesai.")
             break
 
-        # Ambil aturan pertama yang cocok
         r, premis_aktif = aturan_cocok[0]
         memori.add(r["maka"])
         riwayat_alasan[r["maka"]] = (r["id"], premis_aktif, r.get("sumber", "-"))
@@ -100,7 +81,6 @@ def forward_chaining(aturan, memori_awal):
     return memori, riwayat_alasan, log_siklus
 
 def cetak_pohon_alasan(target, riwayat_alasan, indent=2):
-    """Menampilkan penelusuran premis secara rekursif (rantai penalaran)."""
     if target not in riwayat_alasan:
         return
     r_id, premis, sumber = riwayat_alasan[target]
@@ -131,12 +111,10 @@ def main():
 
     memori_akhir, riwayat_alasan, log_siklus = forward_chaining(kb["aturan"], fakta_awal)
 
-    # Tampilkan log siklus inferensi
     for log in log_siklus:
         print(log)
     print()
 
-    # Pisahkan fakta perantara dengan kesimpulan akhir
     fakta_perantara = set()
     for r in kb["aturan"]:
         for s in r["jika"]:
