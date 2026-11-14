@@ -1,0 +1,70 @@
+{
+  "judul": "Sistem Pakar Diagnosis Gangguan Jaringan WiFi dan Internet",
+  "batas": "Aturan disusun berdasarkan literatur ilmiah pada Jurnal TEKNOSI Universitas Andalas (studi kasus jaringan internet Diskominfotik) dan Jurnal JITET Universitas Lampung (identifikasi kerusakan router). Basis pengetahuan ini mencakup identifikasi awal gangguan router, jaringan fisik, dan konektivitas perangkat klien. Hasil diagnosis bersifat rekomendasi teknis awal (triage), bukan keputusan mutlak pengganti audit teknisi jaringan profesional.",
+  "sumber": {
+    "S1": "Ahmad Zaki, dkk. (2023), 'Sistem Pakar Menggunakan Metode Forward Chaining Untuk Mendeteksi Kerusakan Jaringan Internet (Studi Kasus: Di Layanan Internet Diskominfotik Sumatera Barat)', Jurnal TEKNOSI Universitas Andalas, Vol. 9 No. 3, https://doi.org/10.25077/TEKNOSI.v9i3.2023.227-236, diakses 14 Nov 2026",
+    "S2": "Gizwa Budi Nugraha & Rosyid Eko Nugroho (2025), 'Implementasi Sistem Pakar dengan Forward Chaining untuk Identifikasi Kerusakan Router', Jurnal Informatika dan Teknik Elektro Terapan (JITET) Universitas Lampung, Vol. 13 No. 3, https://doi.org/10.23960/jitet.v13i3.6593, diakses 14 Nov 2026"
+  },
+  "aturan": [
+    {
+      "id": "R1",
+      "jika": [
+        "lampu LOS pada modem berkedip merah",
+        "lampu indikator WAN pada router berwarna oranye atau mati"
+      ],
+      "mode": "atau",
+      "maka": "koneksi fisik ke ISP bermasalah",
+      "sumber": "S1"
+    },
+    {
+      "id": "R2",
+      "jika": [
+        "koneksi fisik ke ISP bermasalah",
+        "semua perangkat tidak dapat mengakses internet"
+      ],
+      "mode": "dan",
+      "maka": "gangguan fisik serat optik ISP (perlu penanganan teknisi)",
+      "sumber": "S1"
+    },
+    {
+      "id": "R3",
+      "jika": [
+        "status wifi terhubung tetapi no internet",
+        "IP WAN pada status router bukan 0.0.0.0"
+      ],
+      "mode": "dan",
+      "maka": "kegagalan server DNS (konfigurasikan DNS publik 8.8.8.8 atau 1.1.1.1 pada router)",
+      "sumber": "S2"
+    },
+    {
+      "id": "R4",
+      "jika": [
+        "hanya satu perangkat yang gagal akses internet",
+        "perangkat lain dapat berinternet dengan normal"
+      ],
+      "mode": "dan",
+      "maka": "masalah adapter jaringan atau cache DNS lokal perangkat (lakukan Network Reset atau restart WLAN AutoConfig)",
+      "sumber": "S1"
+    },
+    {
+      "id": "R5",
+      "jika": [
+        "jarak perangkat berada jauh dari letak router",
+        "sinyal terhalang oleh lebih dari dua dinding beton"
+      ],
+      "mode": "atau",
+      "maka": "sinyal wifi lemah",
+      "sumber": "S2"
+    },
+    {
+      "id": "R6",
+      "jika": [
+        "sinyal wifi lemah",
+        "koneksi internet sering putus-nyambung di ruangan tertentu"
+      ],
+      "mode": "dan",
+      "maka": "interferensi dan redaman sinyal tinggi (pindahkan letak router atau pasang Wi-Fi Range Extender/Mesh)",
+      "sumber": "S2"
+    }
+  ]
+}
